@@ -39,23 +39,12 @@ public class ForumActivity extends AppCompatActivity implements SwipeRefreshLayo
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
         listTopik = (ListView) findViewById(R.id.lvTopik);
         swipe   = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
-
-        /*for(int i = 0; i < 15; i++){
-            Topik data = new Topik(" ", " ", "  " + i);
-            mTopik[i] = data;
-
-            listTopik.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    //Topik dataMhs = mTopik[position];
-                    Intent intent = new Intent(ForumActivity.this, IsiTopik.class);
-                    intent.putExtra(EXTRA_MESSAGE,position);
-                    startActivity(intent);
-                }
-            });
-        }*/
 
         //set Adapter ke listview
         Adapter = new TpkAdapter(ForumActivity.this, itemList);

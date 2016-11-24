@@ -7,6 +7,7 @@ package com.galihpw.simak.config;
 public class Config {
     //URL to our login.php file
     public static final String URL = "http://192.168.8.105/~classroom/";
+    //public static final String URL = "http://www.simak.pe.hu/";
 
     //Keys for nip and password as defined in our $_POST['key'] in dosen.php
     public static final String KEY_NIP = "nip";

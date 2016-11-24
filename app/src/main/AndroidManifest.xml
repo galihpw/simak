@@ -41,7 +41,7 @@
             android:name=".ForumActivity"
             android:label="@string/title_activity_forum"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

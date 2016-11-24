@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     ProgressDialog loading;
     Calendar calendar;
     TextView vHariTgl;
+    int n;
     //int n;
 
     //konstanta, supaya bisa membedakan antar message
@@ -96,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
         TextView kelas = (TextView) dia.findViewById(R.id.kelas);
         TextView noKontak = (TextView) dia.findViewById(R.id.noKontak);
         TextView alamat = (TextView) dia.findViewById(R.id.alamat);
-        final TextView bintang = (TextView) dia.findViewById(R.id.jBintang);
+        TextView bintang = (TextView) dia.findViewById(R.id.jBintang);
 
         nama.setText(": " + dataMhs.getNama());
         nim.setText(": " + dataMhs.getNim());
@@ -122,11 +123,11 @@ public class MainActivity extends AppCompatActivity {
         bin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*Double bin = Double.valueOf(dataMhs.getBintang());
-                Double jbin = bin + 1;
+                String m = dataMhs.getBintang();
+                n = Integer.valueOf(m);
+                n++;
 
-                String.valueOf(jbin);
-                bintang.setText(": " + jbin);*/
+                Toast.makeText(MainActivity.this, ""+n, Toast.LENGTH_SHORT).show();
 
                 dia.dismiss();
             }
@@ -299,5 +300,50 @@ public class MainActivity extends AppCompatActivity {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(jArr);
     }
+
+    /*private void updateBintang(final Mhs dataMhs) {
+        loading = ProgressDialog.show(this,"Please wait...","Updating Data...",false,false);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_bintang, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                //If we are getting success from server
+                if(response.equalsIgnoreCase(Config.LOGIN_SUCCESS)){
+                    loading.dismiss();
+
+                    //If the server response is success
+                    //Displaying an message on toast
+                    Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_LONG).show();
+                }else{
+                    loading.dismiss();
+
+                    //If the server response is not success
+                    //Displaying an error message on toast
+                    Toast.makeText(MainActivity.this, "Data not Updated", Toast.LENGTH_LONG).show();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                loading.dismiss();
+                Toast.makeText(MainActivity.this,"No Connection",Toast.LENGTH_LONG).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params = new HashMap<>();
+                //Adding parameters to request
+                params.put(Config.KEY_NIM, dataMhs.getNim());
+                params.put(Config.KEY_BINTANG, "" + n);
+
+                //returning parameter
+                return params;
+            }
+        };
+
+        //Adding the string request to the queue
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+    }*/
 
 }
