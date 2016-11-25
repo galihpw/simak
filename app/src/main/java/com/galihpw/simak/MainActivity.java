@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static String url_gDosen 	 = Config.URL + "getDosen.php";
     private static String url_gAllMhs 	 = Config.URL + "getAllMhs.php";
+    private static String url_uBintang 	 = Config.URL + "updateBintang.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
                 n = Integer.valueOf(m);
                 n++;
 
-                Toast.makeText(MainActivity.this, ""+n, Toast.LENGTH_SHORT).show();
+                updateBintang(dataMhs);
 
                 dia.dismiss();
             }
@@ -301,10 +302,10 @@ public class MainActivity extends AppCompatActivity {
         requestQueue.add(jArr);
     }
 
-    /*private void updateBintang(final Mhs dataMhs) {
+    private void updateBintang(final Mhs dataMhs) {
         loading = ProgressDialog.show(this,"Please wait...","Updating Data...",false,false);
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_bintang, new Response.Listener<String>() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_uBintang, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 //If we are getting success from server
@@ -344,6 +345,6 @@ public class MainActivity extends AppCompatActivity {
         //Adding the string request to the queue
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(stringRequest);
-    }*/
+    }
 
 }
