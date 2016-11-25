@@ -311,13 +311,13 @@ public class MainActivity extends AppCompatActivity {
                 //If we are getting success from server
                 if(response.equalsIgnoreCase(Config.LOGIN_SUCCESS)){
                     loading.dismiss();
-
+                    getDataMhs();
                     //If the server response is success
                     //Displaying an message on toast
                     Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_LONG).show();
                 }else{
                     loading.dismiss();
-
+                    getDataMhs();
                     //If the server response is not success
                     //Displaying an error message on toast
                     Toast.makeText(MainActivity.this, "Data not Updated", Toast.LENGTH_LONG).show();

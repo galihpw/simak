@@ -309,6 +309,7 @@ public class ProfileDosen extends AppCompatActivity {
     }
 
     public void saveProf(){
+        vAlamat.setText(edAlamat.getText().toString());
         vKontak.setText(edKontak.getText().toString());
         vEmail.setText(edEmail.getText().toString());
         vFB.setText(edFB.getText().toString());
