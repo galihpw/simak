@@ -47,7 +47,7 @@
             android:textSize="14dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/textView"
+            android:id="@+id/tvKode"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:layout_alignParentTop="true"
@@ -58,10 +58,10 @@
             android:textSize="14dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/textView2"
-            android:layout_below="@+id/textView"
-            android:layout_alignLeft="@+id/textView"
-            android:layout_alignStart="@+id/textView" />
+            android:id="@+id/tvMatkul"
+            android:layout_below="@+id/tvKode"
+            android:layout_alignLeft="@+id/tvKode"
+            android:layout_alignStart="@+id/tvKode" />
 
         <TextView
             android:text="Jumlah Mahasiswa :"
@@ -70,9 +70,9 @@
             android:layout_height="wrap_content"
             android:id="@+id/textView3"
             android:layout_marginBottom="10dp"
-            android:layout_below="@+id/textView2"
-            android:layout_alignLeft="@+id/textView2"
-            android:layout_alignStart="@+id/textView2" />
+            android:layout_below="@+id/tvMatkul"
+            android:layout_alignLeft="@+id/tvMatkul"
+            android:layout_alignStart="@+id/tvMatkul" />
 
     </RelativeLayout>
 

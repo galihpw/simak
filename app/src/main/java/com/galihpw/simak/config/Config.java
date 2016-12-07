@@ -13,6 +13,11 @@ public class Config {
     public static final String KEY_NIP = "nip";
     public static final String KEY_PASSWORD = "password";
 
+    //Keys for catch data in getJadwal.php
+    public static final String KEY_HARI = "hari";
+    public static final String KEY_KODE_MATKUL = "kode_matkul";
+    public static final String KEY_NAMA_MATKUL = "nama_matkul";
+
     //Keys for catch dosen data in dosen.php
     public static final String KEY_NAMA_DOSEN = "nama_dosen";
     public static final String KEY_KONTAK_DOSEN = "kontak_dosen";

@@ -45,19 +45,18 @@ public class MainActivity extends AppCompatActivity {
 
     private Mhs[] mMhs;
     Dialog dia;
-    int jbin[];
-    String nip, sNama;
+    String nip, sNama, dayName, kodeMatkul, namaMatkul;
     ProgressDialog loading;
     Calendar calendar;
     TextView vHariTgl;
     int n;
-    //int n;
 
     //konstanta, supaya bisa membedakan antar message
     public final static String EXTRA_MESSAGE = "com.galihpw.NIP";
 
     private static String url_gDosen 	 = Config.URL + "getDosen.php";
     private static String url_gAllMhs 	 = Config.URL + "getAllMhs.php";
+    private static String url_gJadwal 	 = Config.URL + "getJadwal.php";
     private static String url_uBintang 	 = Config.URL + "updateBintang.php";
 
     @Override
@@ -75,10 +74,34 @@ public class MainActivity extends AppCompatActivity {
         //Day of Name in full form like,"Saturday", or if you need the first three characters you have to put "EEE" in the date format and your result will be "Sat".
         SimpleDateFormat sdf_ = new SimpleDateFormat("EEEE");
         Date date = new Date();
-        String dayName = sdf_.format(date);
+        dayName = sdf_.format(date);
+        switch (dayName) {
+            case "Monday":
+                dayName = "Senin";
+                break;
+            case "Tuesday":
+                dayName = "Selasa";
+                break;
+            case "Wednesday":
+                dayName = "Rabu";
+                break;
+            case "Thursday":
+                dayName = "Kamis";
+                break;
+            case "Friday":
+                dayName = "Jumat";
+                break;
+            case "Saturday":
+                dayName = "Sabtu";
+                break;
+            case "Sunday":
+                dayName = "Minggu";
+                break;
+        }
         vHariTgl.setText("" + dayName + ", " + currentDate + "");
 
         //get data
+        getJadwal();
         getData();
         getDataMhs();
 
@@ -213,13 +236,63 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void getJadwal(){
+        //loading = ProgressDialog.show(this,"Please wait...","Getting Data...",false,false);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_gJadwal, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                loading.dismiss();
+                showJSONJadwal(response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                loading.dismiss();
+                Toast.makeText(MainActivity.this,"No Connection",Toast.LENGTH_LONG).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params = new HashMap<>();
+                //Adding parameters to request
+                params.put(Config.KEY_NIP, nip);
+                params.put(Config.KEY_HARI, dayName);
+
+                //returning parameter
+                return params;
+            }
+        };
+
+        //Adding the string request to the queue
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+    }
+
+    private void showJSONJadwal(String response){
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            JSONArray result = jsonObject.getJSONArray(Config.JSON_ARRAY);
+            JSONObject Data = result.getJSONObject(0);
+            kodeMatkul = Data.getString(Config.KEY_KODE_MATKUL);
+            namaMatkul = Data.getString(Config.KEY_NAMA_MATKUL);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        TextView namaMat = (TextView) findViewById(R.id.tvMatkul);
+        namaMat.setText("Mata Kuliah : " + namaMatkul);
+
+        TextView kodeMat = (TextView) findViewById(R.id.tvKode);
+        kodeMat.setText("Kode : " + kodeMatkul);
+    }
+
     private void getData() {
         loading = ProgressDialog.show(this,"Please wait...","Getting Data...",false,false);
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url_gDosen, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                loading.dismiss();
+                //loading.dismiss();
                 showJSON(response);
             }
         }, new Response.ErrorListener() {
@@ -295,7 +368,17 @@ public class MainActivity extends AppCompatActivity {
                 loading.dismiss();
                 Toast.makeText(MainActivity.this,"No Connection",Toast.LENGTH_LONG).show();
             }
-        });
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params = new HashMap<>();
+                //Adding parameters to request
+                params.put(Config.KEY_HARI, dayName);
+
+                //returning parameter
+                return params;
+            }
+        };
 
         // menambah request ke request queue
         RequestQueue requestQueue = Volley.newRequestQueue(this);
