@@ -6,10 +6,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.view.menu.MenuView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -30,6 +32,10 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.galihpw.simak.adapter.MhsAdapter;
 import com.galihpw.simak.config.Config;
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,13 +45,14 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
     private Mhs[] mMhs;
     Dialog dia;
-    String nip, sNama, dayName, kodeMatkul, namaMatkul;
+    String nip, sNama, dayName, kodeMatkul, namaMatkul, waktuMulai, waktuSelesai;
     ProgressDialog loading;
     Calendar calendar;
     TextView vHariTgl;
@@ -54,10 +61,15 @@ public class MainActivity extends AppCompatActivity {
     //konstanta, supaya bisa membedakan antar message
     public final static String EXTRA_MESSAGE = "com.galihpw.NIP";
 
-    private static String url_gDosen 	 = Config.URL + "getDosen.php";
-    private static String url_gAllMhs 	 = Config.URL + "getAllMhs.php";
-    private static String url_gJadwal 	 = Config.URL + "getJadwal.php";
-    private static String url_uBintang 	 = Config.URL + "updateBintang.php";
+    private static String url_gDosen = Config.URL + "getDosen.php";
+    private static String url_gAllMhs = Config.URL + "getAllMhs.php";
+    private static String url_gJadwal = Config.URL + "getJadwal.php";
+    private static String url_uBintang = Config.URL + "updateBintang.php";
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,10 +121,13 @@ public class MainActivity extends AppCompatActivity {
         Intent intent2 = getIntent();
         //ambil datanya
         nip = intent2.getStringExtra(LoginActivity.EXTRA_MESSAGE);
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     //method untuk membuat halaman menjadi dialog
-    public void cobaCustomDialog(final Mhs dataMhs){
+    public void cobaCustomDialog(final Mhs dataMhs) {
         dia = new Dialog(MainActivity.this);
         dia.setContentView(R.layout.profil);
 
@@ -159,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Logout function
-    private void logout(){
+    private void logout() {
         //Creating an alert dialog to confirm logout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setMessage("Are you sure you want to logout?");
@@ -190,13 +205,13 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-            alertDialogBuilder.setNegativeButton("No",
-            new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface arg0, int arg1) {
+        alertDialogBuilder.setNegativeButton("No",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
 
-                }
-            });
+                    }
+                });
 
         //Showing the alert dialog
         AlertDialog alertDialog = alertDialogBuilder.create();
@@ -212,8 +227,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch (item.getItemId()){
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
             case R.id.logout:
                 logout();
 
@@ -236,8 +251,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void getJadwal(){
-        //loading = ProgressDialog.show(this,"Please wait...","Getting Data...",false,false);
+    private void getJadwal() {
+        loading = ProgressDialog.show(this, "Please wait...", "Getting Data...", false, false);
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url_gJadwal, new Response.Listener<String>() {
             @Override
@@ -249,12 +264,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 loading.dismiss();
-                Toast.makeText(MainActivity.this,"No Connection",Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "No Connection", Toast.LENGTH_LONG).show();
             }
-        }){
+        }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String,String> params = new HashMap<>();
+                Map<String, String> params = new HashMap<>();
                 //Adding parameters to request
                 params.put(Config.KEY_NIP, nip);
                 params.put(Config.KEY_HARI, dayName);
@@ -269,13 +284,15 @@ public class MainActivity extends AppCompatActivity {
         requestQueue.add(stringRequest);
     }
 
-    private void showJSONJadwal(String response){
+    private void showJSONJadwal(String response) {
         try {
             JSONObject jsonObject = new JSONObject(response);
             JSONArray result = jsonObject.getJSONArray(Config.JSON_ARRAY);
             JSONObject Data = result.getJSONObject(0);
             kodeMatkul = Data.getString(Config.KEY_KODE_MATKUL);
             namaMatkul = Data.getString(Config.KEY_NAMA_MATKUL);
+            waktuMulai = Data.getString(Config.KEY_WAKTU_MULAI);
+            waktuSelesai = Data.getString(Config.KEY_WAKTU_SELESAI);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -284,10 +301,13 @@ public class MainActivity extends AppCompatActivity {
 
         TextView kodeMat = (TextView) findViewById(R.id.tvKode);
         kodeMat.setText("Kode : " + kodeMatkul);
+
+        compareDates();
+        Toast.makeText(this, "Masuk->" + waktuMulai + " | Keluar->" + waktuSelesai, Toast.LENGTH_SHORT).show();
     }
 
     private void getData() {
-        loading = ProgressDialog.show(this,"Please wait...","Getting Data...",false,false);
+        //loading = ProgressDialog.show(this,"Please wait...","Getting Data...",false,false);
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url_gDosen, new Response.Listener<String>() {
             @Override
@@ -299,12 +319,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 loading.dismiss();
-                Toast.makeText(MainActivity.this,"No Connection",Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "No Connection", Toast.LENGTH_LONG).show();
             }
-        }){
+        }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String,String> params = new HashMap<>();
+                Map<String, String> params = new HashMap<>();
                 //Adding parameters to request
                 params.put(Config.KEY_NIP, nip);
 
@@ -318,7 +338,7 @@ public class MainActivity extends AppCompatActivity {
         requestQueue.add(stringRequest);
     }
 
-    private void showJSON(String response){
+    private void showJSON(String response) {
         try {
             JSONObject jsonObject = new JSONObject(response);
             JSONArray result = jsonObject.getJSONArray(Config.JSON_ARRAY);
@@ -331,14 +351,75 @@ public class MainActivity extends AppCompatActivity {
         menuTitle.setTitle(sNama);
     }
 
+    private void getDataMhs() {
+        //loading = ProgressDialog.show(this,"Please wait...","Getting Data...",false,false);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_gAllMhs, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                //loading.dismiss();
+                Log.v("tes", response);
+                showJSONMhs(response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                loading.dismiss();
+                Toast.makeText(MainActivity.this, "No Connection", Toast.LENGTH_LONG).show();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                //Adding parameters to request
+                params.put(Config.KEY_HARI, "Senin");
+
+                //returning parameter
+                return params;
+            }
+        };
+
+        //Adding the string request to the queue
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+    }
+
+    private void showJSONMhs(String response) {
+        GridView gridview = (GridView) findViewById(R.id.gridview);
+        try {
+            JSONArray result = new JSONArray(response);
+            mMhs = new Mhs[result.length()];
+            Toast.makeText(MainActivity.this, "" + result.length(), Toast.LENGTH_LONG).show();
+            // Parsing json
+            for (int i = 0; i < result.length(); i++) {
+                JSONObject Data = result.getJSONObject(i);
+                Mhs data = new Mhs("" + Data.getString(Config.KEY_NAMA_MHS), "" + Data.getString(Config.KEY_NIM), "" + Data.getString(Config.KEY_KELAS), "" + Data.getString(Config.KEY_KONTAK_MHS), "" + Data.getString(Config.KEY_ALAMAT_MHS), "" + Data.getInt(Config.KEY_BINTANG));
+                mMhs[i] = data;
+
+                gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        Mhs dataMhs = mMhs[position];
+                        cobaCustomDialog(dataMhs);
+                    }
+                });
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        MhsAdapter adapter = new MhsAdapter(MainActivity.this, mMhs);
+        gridview.setAdapter(adapter);
+    }
+
     // untuk menampilkan semua data pada gridview
-    private void getDataMhs(){
+    /*private void getDataMhs(){
         // membuat request JSON
         JsonArrayRequest jArr = new JsonArrayRequest(url_gAllMhs, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 GridView gridview = (GridView) findViewById(R.id.gridview);
-                mMhs = new Mhs[15];
+                mMhs = new Mhs[response.length()];
+                Toast.makeText(MainActivity.this, "" + response.length(), Toast.LENGTH_SHORT).show();
                 // Parsing json
                 for (int i = 0; i < response.length(); i++) {
                     try {
@@ -373,7 +454,7 @@ public class MainActivity extends AppCompatActivity {
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String,String> params = new HashMap<>();
                 //Adding parameters to request
-                params.put(Config.KEY_HARI, dayName);
+                params.put(Config.KEY_HARI, "Selasa");
 
                 //returning parameter
                 return params;
@@ -383,22 +464,22 @@ public class MainActivity extends AppCompatActivity {
         // menambah request ke request queue
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(jArr);
-    }
+    }*/
 
     private void updateBintang(final Mhs dataMhs) {
-        loading = ProgressDialog.show(this,"Please wait...","Updating Data...",false,false);
+        loading = ProgressDialog.show(this, "Please wait...", "Updating Data...", false, false);
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url_uBintang, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 //If we are getting success from server
-                if(response.equalsIgnoreCase(Config.LOGIN_SUCCESS)){
+                if (response.equalsIgnoreCase(Config.LOGIN_SUCCESS)) {
                     loading.dismiss();
                     getDataMhs();
                     //If the server response is success
                     //Displaying an message on toast
                     Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_LONG).show();
-                }else{
+                } else {
                     loading.dismiss();
                     getDataMhs();
                     //If the server response is not success
@@ -410,12 +491,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 loading.dismiss();
-                Toast.makeText(MainActivity.this,"No Connection",Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "No Connection", Toast.LENGTH_LONG).show();
             }
-        }){
+        }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String,String> params = new HashMap<>();
+                Map<String, String> params = new HashMap<>();
                 //Adding parameters to request
                 params.put(Config.KEY_NIM, dataMhs.getNim());
                 params.put(Config.KEY_BINTANG, "" + n);
@@ -430,4 +511,36 @@ public class MainActivity extends AppCompatActivity {
         requestQueue.add(stringRequest);
     }
 
+    // Compare Time
+    public static final String inputFormat = "HH:mm";
+
+    //private String compareStringOne = "9:45";
+    //private String compareStringTwo = "1:45";
+
+    SimpleDateFormat inputParser = new SimpleDateFormat(inputFormat, Locale.US);
+
+    private void compareDates(){
+        Calendar now = Calendar.getInstance();
+
+        int hour = now.get(Calendar.HOUR);
+        int minute = now.get(Calendar.MINUTE);
+
+        Date date = parseDate(hour + ":" + minute);
+        Date dateCompareOne = parseDate(waktuMulai);
+        Date dateCompareTwo = parseDate(waktuSelesai);
+
+        if(dateCompareOne.before(date) && dateCompareTwo.after(date)) {
+            //want to do
+            Log.v("tes","masuk masuk masuk");
+        }
+    }
+
+    private Date parseDate(String date) {
+
+        try {
+            return inputParser.parse(date);
+        } catch (java.text.ParseException e) {
+            return new Date(0);
+        }
+    }
 }
