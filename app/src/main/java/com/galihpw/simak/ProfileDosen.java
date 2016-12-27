@@ -11,6 +11,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -24,6 +25,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.galihpw.simak.config.Config;
@@ -39,9 +41,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+
+import static com.galihpw.simak.config.Config.KEY_NIP;
+import static com.galihpw.simak.config.Config.KEY_PHOTO;
 
 public class ProfileDosen extends AppCompatActivity {
 
@@ -53,9 +59,11 @@ public class ProfileDosen extends AppCompatActivity {
     static final int REQUEST_CAMERA = 0;
     static final int SELECT_FILE = 1;
     private String userChoosenTask;
+    Bitmap bitmap;
 
     private static String url_gDosen 	 = Config.URL + "getDosen.php";
     private static String url_uDosen 	 = Config.URL + "updateDosen.php";
+    private static String UPLOAD_URL     = Config.URL + "uploadPhotoDosen.php";
     ProgressDialog loading;
 
     String[] value = new String[]{
@@ -72,7 +80,7 @@ public class ProfileDosen extends AppCompatActivity {
         //ambil intent
         Intent intent2 = getIntent();
         //ambil datanya
-        nip = intent2.getStringExtra(MainActivity.EXTRA_MESSAGE);
+        nip = intent2.getStringExtra(MainActivity.MAIN_MESSAGE);
 
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeButtonEnabled(true);
@@ -96,7 +104,8 @@ public class ProfileDosen extends AppCompatActivity {
         imgProfile = (CircleImageView) findViewById(R.id.imgProfile);
         imgProfile.setImageResource(R.drawable.default_profile);
 
-        getData();
+        loading = ProgressDialog.show(this,"Please wait...","Getting Data...",false,false);
+        getPhoto();
 
         imgProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,8 +143,7 @@ public class ProfileDosen extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    @Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case Utility.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -143,8 +151,6 @@ public class ProfileDosen extends AppCompatActivity {
                         cameraIntent();
                     else if(userChoosenTask.equals("Choose from Library"))
                         galleryIntent();
-                } else {
-                    //code for deny
                 }
                 break;
         }
@@ -211,9 +217,9 @@ public class ProfileDosen extends AppCompatActivity {
     }
 
     private void onCaptureImageResult(Intent data) {
-        Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+        bitmap = (Bitmap) data.getExtras().get("data");
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
         File destination = new File(Environment.getExternalStorageDirectory(),
                 System.currentTimeMillis() + ".jpg");
         FileOutputStream fo;
@@ -227,24 +233,105 @@ public class ProfileDosen extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        imgProfile.setImageBitmap(thumbnail);
+        uploadPhoto();
+        //imgProfile.setImageBitmap(thumbnail);
     }
 
     @SuppressWarnings("deprecation")
     private void onSelectFromGalleryResult(Intent data) {
-        Bitmap bm=null;
+        bitmap=null;
         if (data != null) {
             try {
-                bm = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), data.getData());
+                bitmap = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), data.getData());
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        imgProfile.setImageBitmap(bm);
+        uploadPhoto();
+        //imgProfile.setImageBitmap(bm);
+    }
+
+    public String getStringImage(Bitmap bmp){
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        return encodedImage;
+    }
+
+    private void uploadPhoto(){
+        //Showing the progress dialog
+        final ProgressDialog loading = ProgressDialog.show(this,"Uploading...","Please wait...",false,false);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, UPLOAD_URL,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String s) {
+                        //Disimissing the progress dialog
+                        loading.dismiss();
+                        //Showing toast message of the response
+                        Toast.makeText(ProfileDosen.this, s , Toast.LENGTH_LONG).show();
+                        //Get photo from database
+                        getPhoto();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        //Dismissing the progress dialog
+                        loading.dismiss();
+
+                        //Showing toast
+                        Toast.makeText(ProfileDosen.this, volleyError.getMessage().toString(), Toast.LENGTH_LONG).show();
+                    }
+                }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                //Converting Bitmap to String
+                String photo = getStringImage(bitmap);
+
+                //Creating parameters
+                Map<String,String> params = new Hashtable<String, String>();
+
+                //Adding parameters
+                params.put(KEY_PHOTO, photo);
+                params.put(KEY_NIP, nip);
+
+                //returning parameters
+                return params;
+            }
+        };
+
+        //Creating a Request Queue
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+        //Adding request to the queue
+        requestQueue.add(stringRequest);
+    }
+
+    private void getPhoto(){
+        String url = ""+Config.URL+"photo/"+nip+".png";
+
+        // Retrieves an image specified by the URL, displays it in the UI.
+        ImageRequest request = new ImageRequest(url,
+                new Response.Listener<Bitmap>() {
+                    @Override
+                    public void onResponse(Bitmap bitmap) {
+                        imgProfile.setImageBitmap(bitmap);
+                        getData();
+                    }
+                }, 0, 0, null,
+                new Response.ErrorListener() {
+                    public void onErrorResponse(VolleyError error) {
+                        imgProfile.setImageResource(R.drawable.default_profile);
+                        getData();
+                    }
+                });
+        // Access the RequestQueue through your singleton class.
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(request);
     }
 
     private void getData() {
-        loading = ProgressDialog.show(this,"Please wait...","Getting Data...",false,false);
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url_gDosen, new Response.Listener<String>() {
             @Override
@@ -262,7 +349,7 @@ public class ProfileDosen extends AppCompatActivity {
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String,String> params = new HashMap<>();
                 //Adding parameters to request
-                params.put(Config.KEY_NIP, nip);
+                params.put(KEY_NIP, nip);
 
                 //returning parameter
                 return params;
@@ -279,7 +366,7 @@ public class ProfileDosen extends AppCompatActivity {
             JSONObject jsonObject = new JSONObject(response);
             JSONArray result = jsonObject.getJSONArray(Config.JSON_ARRAY);
             JSONObject Data = result.getJSONObject(0);
-            sNip = Data.getString(Config.KEY_NIP);
+            sNip = Data.getString(KEY_NIP);
             sNama = Data.getString(Config.KEY_NAMA_DOSEN);
             sAlamat = Data.getString(Config.KEY_ALAMAT_DOSEN);
             sKontak = Data.getString(Config.KEY_KONTAK_DOSEN);
@@ -356,19 +443,26 @@ public class ProfileDosen extends AppCompatActivity {
             @Override
             public void onResponse(String response) {
                 //If we are getting success from server
-                if(response.equalsIgnoreCase(Config.LOGIN_SUCCESS)){
-                    loading.dismiss();
+                try {
+                    JSONObject jObj = new JSONObject(response);
+                    int success = jObj.getInt(Config.LOGIN_SUCCESS);
 
-                    switcher();
-                    //If the server response is success
-                    //Displaying an message on toast
-                    Toast.makeText(ProfileDosen.this, "Success", Toast.LENGTH_LONG).show();
-                }else{
-                    loading.dismiss();
-
-                    //If the server response is not success
-                    //Displaying an error message on toast
-                    Toast.makeText(ProfileDosen.this, "Data not Updated", Toast.LENGTH_LONG).show();
+                    if (success == 1) {
+                        loading.dismiss();
+                        getData();
+                        switcher();
+                        //If the server response is success
+                        //Displaying an message on toast
+                        Toast.makeText(ProfileDosen.this, "Success", Toast.LENGTH_LONG).show();
+                    } else {
+                        loading.dismiss();
+                        //getDataMhs();
+                        //If the server response is not success
+                        //Displaying an error message on toast
+                        Toast.makeText(ProfileDosen.this, "Data not Updated", Toast.LENGTH_LONG).show();
+                    }
+                }catch (JSONException e){
+                    e.printStackTrace();
                 }
             }
         }, new Response.ErrorListener() {
@@ -382,7 +476,7 @@ public class ProfileDosen extends AppCompatActivity {
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String,String> params = new HashMap<>();
                 //Adding parameters to request
-                params.put(Config.KEY_NIP, nip);
+                params.put(KEY_NIP, nip);
                 params.put(Config.KEY_ALAMAT_DOSEN, edAlamat.getText().toString());
                 params.put(Config.KEY_KONTAK_DOSEN, edKontak.getText().toString());
                 params.put(Config.KEY_EMAIL_DOSEN, edEmail.getText().toString());

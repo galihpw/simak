@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -27,15 +26,10 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.galihpw.simak.adapter.MhsAdapter;
 import com.galihpw.simak.config.Config;
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
-import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,20 +50,17 @@ public class MainActivity extends AppCompatActivity {
     ProgressDialog loading;
     Calendar calendar;
     TextView vHariTgl;
-    int n;
+    int n, status;
 
     //konstanta, supaya bisa membedakan antar message
-    public final static String EXTRA_MESSAGE = "com.galihpw.NIP";
+    public final static String MAIN_MESSAGE = "com.galihpw.NIP";
 
     private static String url_gDosen = Config.URL + "getDosen.php";
     private static String url_gAllMhs = Config.URL + "getAllMhs.php";
     private static String url_gJadwal = Config.URL + "getJadwal.php";
     private static String url_uBintang = Config.URL + "updateBintang.php";
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
+    private static String url_uPertemuan = Config.URL + "updateMatkul.php";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,11 +71,11 @@ public class MainActivity extends AppCompatActivity {
 
         calendar = Calendar.getInstance();
         //date format is:  "Date-Month-Year Hour:Minutes am/pm"
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy"); //Date
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy", Locale.US); //Date
         String currentDate = sdf.format(calendar.getTime());
 
         //Day of Name in full form like,"Saturday", or if you need the first three characters you have to put "EEE" in the date format and your result will be "Sat".
-        SimpleDateFormat sdf_ = new SimpleDateFormat("EEEE");
+        SimpleDateFormat sdf_ = new SimpleDateFormat("EEEE", Locale.US);
         Date date = new Date();
         dayName = sdf_.format(date);
         switch (dayName) {
@@ -112,18 +103,15 @@ public class MainActivity extends AppCompatActivity {
         }
         vHariTgl.setText("" + dayName + ", " + currentDate + "");
 
-        //get data
-        getJadwal();
-        getData();
-        getDataMhs();
-
         //ambil intent
         Intent intent2 = getIntent();
         //ambil datanya
-        nip = intent2.getStringExtra(LoginActivity.EXTRA_MESSAGE);
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+        nip = intent2.getStringExtra(LoginActivity.LOGIN_MESSAGE);
+        status = Integer.valueOf(intent2.getStringExtra(LoginActivity.LOGIN_MESSAGE1));
+
+        //get data
+        loading = ProgressDialog.show(this, "Please wait...", "Getting Data1...", false, false);
+        getJadwal();
     }
 
     //method untuk membuat halaman menjadi dialog
@@ -242,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.profile:
                 //Starting profile activity
                 Intent intent = new Intent(MainActivity.this, ProfileDosen.class);
-                intent.putExtra(EXTRA_MESSAGE, nip);
+                intent.putExtra(MAIN_MESSAGE, nip);
                 startActivity(intent);
 
                 return true;
@@ -252,18 +240,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getJadwal() {
-        loading = ProgressDialog.show(this, "Please wait...", "Getting Data...", false, false);
+        //loading = ProgressDialog.show(this, "Please wait...", "Getting Data1...", false, false);
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url_gJadwal, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                loading.dismiss();
+                //loading.dismiss();
                 showJSONJadwal(response);
+                getData();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                loading.dismiss();
+                //loading.dismiss();
                 Toast.makeText(MainActivity.this, "No Connection", Toast.LENGTH_LONG).show();
             }
         }) {
@@ -314,11 +303,12 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(String response) {
                 //loading.dismiss();
                 showJSON(response);
+                getDataMhs();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                loading.dismiss();
+                //loading.dismiss();
                 Toast.makeText(MainActivity.this, "No Connection", Toast.LENGTH_LONG).show();
             }
         }) {
@@ -357,14 +347,19 @@ public class MainActivity extends AppCompatActivity {
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url_gAllMhs, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                //loading.dismiss();
-                Log.v("tes", response);
+                //oading.dismiss();
+                //Log.v("tes", response);
                 showJSONMhs(response);
+                if(status == 0) {
+                    updatePertemuan();
+                }else{
+                    loading.dismiss();
+                }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                loading.dismiss();
+                //loading.dismiss();
                 Toast.makeText(MainActivity.this, "No Connection", Toast.LENGTH_LONG).show();
             }
         }) {
@@ -372,7 +367,8 @@ public class MainActivity extends AppCompatActivity {
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
                 //Adding parameters to request
-                params.put(Config.KEY_HARI, "Senin");
+                params.put(Config.KEY_HARI, dayName);
+                params.put(Config.KEY_KODE_MATKUL, "" + kodeMatkul);
 
                 //returning parameter
                 return params;
@@ -389,12 +385,16 @@ public class MainActivity extends AppCompatActivity {
         try {
             JSONArray result = new JSONArray(response);
             mMhs = new Mhs[result.length()];
-            Toast.makeText(MainActivity.this, "" + result.length(), Toast.LENGTH_LONG).show();
+
+            TextView jmlhMhs = (TextView) findViewById(R.id.tvJmlhMhs);
+            jmlhMhs.setText("Jumlah Mahasiswa : " + result.length());
+
             // Parsing json
             for (int i = 0; i < result.length(); i++) {
                 JSONObject Data = result.getJSONObject(i);
                 Mhs data = new Mhs("" + Data.getString(Config.KEY_NAMA_MHS), "" + Data.getString(Config.KEY_NIM), "" + Data.getString(Config.KEY_KELAS), "" + Data.getString(Config.KEY_KONTAK_MHS), "" + Data.getString(Config.KEY_ALAMAT_MHS), "" + Data.getInt(Config.KEY_BINTANG));
                 mMhs[i] = data;
+
 
                 gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
@@ -410,6 +410,139 @@ public class MainActivity extends AppCompatActivity {
         MhsAdapter adapter = new MhsAdapter(MainActivity.this, mMhs);
         gridview.setAdapter(adapter);
     }
+
+    private void updateBintang(final Mhs dataMhs) {
+        loading = ProgressDialog.show(this, "Please wait...", "Updating Data...", false, false);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_uBintang, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                //If we are getting success from server
+                try {
+                    JSONObject jObj = new JSONObject(response);
+                    int success = jObj.getInt(Config.LOGIN_SUCCESS);
+
+                    if (success == 1) {
+                        //loading.dismiss();
+                        status = 1;
+                        getDataMhs();
+                        //If the server response is success
+                        //Displaying an message on toast
+                        Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_LONG).show();
+                    } else {
+                        loading.dismiss();
+                        //getDataMhs();
+                        //If the server response is not success
+                        //Displaying an error message on toast
+                        Toast.makeText(MainActivity.this, "Data not Updated", Toast.LENGTH_LONG).show();
+                    }
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                loading.dismiss();
+                Toast.makeText(MainActivity.this, "No Connection", Toast.LENGTH_LONG).show();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                //Adding parameters to request
+                params.put(Config.KEY_NIM, dataMhs.getNim());
+                params.put(Config.KEY_KODE_MATKUL, kodeMatkul);
+
+                //returning parameter
+                return params;
+            }
+        };
+
+        //Adding the string request to the queue
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+    }
+
+    private void updatePertemuan() {
+        //loading = ProgressDialog.show(this, "Please wait...", "Updating Data...", false, false);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_uPertemuan, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                //If we are getting success from server
+                try {
+                    JSONObject jObj = new JSONObject(response);
+                    int success = jObj.getInt(Config.LOGIN_SUCCESS);
+
+                    if (success == 1) {
+                        loading.dismiss();
+                        //If the server response is success
+                        //Displaying an message on toast
+                        Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_LONG).show();
+                    } else {
+                       //loading.dismiss();
+                        //If the server response is not success
+                        //Displaying an error message on toast
+                        Toast.makeText(MainActivity.this, "Data not Updated", Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //loading.dismiss();
+                Toast.makeText(MainActivity.this, "No Connection", Toast.LENGTH_LONG).show();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                //Adding parameters to request
+                params.put(Config.KEY_KODE_MATKUL, "" + kodeMatkul);
+
+                //returning parameter
+                return params;
+            }
+        };
+
+        //Adding the string request to the queue
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+    }
+
+    // Compare Time
+    public static final String inputFormat = "HH:mm";
+
+    SimpleDateFormat inputParser = new SimpleDateFormat(inputFormat, Locale.US);
+
+    private void compareDates(){
+        Calendar now = Calendar.getInstance();
+
+        int hour = now.get(Calendar.HOUR);
+        int minute = now.get(Calendar.MINUTE);
+
+        Date date = parseDate(hour + ":" + minute);
+        Date dateCompareOne = parseDate(waktuMulai);
+        Date dateCompareTwo = parseDate(waktuSelesai);
+
+        if(dateCompareOne.before(date) && dateCompareTwo.after(date)) {
+            //want to do
+            Log.v("tes","masuk masuk masuk");
+        }
+    }
+
+    private Date parseDate(String date) {
+
+        try {
+            return inputParser.parse(date);
+        } catch (java.text.ParseException e) {
+            return new Date(0);
+        }
+    }
+}
 
     // untuk menampilkan semua data pada gridview
     /*private void getDataMhs(){
@@ -465,82 +598,3 @@ public class MainActivity extends AppCompatActivity {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(jArr);
     }*/
-
-    private void updateBintang(final Mhs dataMhs) {
-        loading = ProgressDialog.show(this, "Please wait...", "Updating Data...", false, false);
-
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_uBintang, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                //If we are getting success from server
-                if (response.equalsIgnoreCase(Config.LOGIN_SUCCESS)) {
-                    loading.dismiss();
-                    getDataMhs();
-                    //If the server response is success
-                    //Displaying an message on toast
-                    Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_LONG).show();
-                } else {
-                    loading.dismiss();
-                    getDataMhs();
-                    //If the server response is not success
-                    //Displaying an error message on toast
-                    Toast.makeText(MainActivity.this, "Data not Updated", Toast.LENGTH_LONG).show();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                loading.dismiss();
-                Toast.makeText(MainActivity.this, "No Connection", Toast.LENGTH_LONG).show();
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                //Adding parameters to request
-                params.put(Config.KEY_NIM, dataMhs.getNim());
-                params.put(Config.KEY_BINTANG, "" + n);
-
-                //returning parameter
-                return params;
-            }
-        };
-
-        //Adding the string request to the queue
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(stringRequest);
-    }
-
-    // Compare Time
-    public static final String inputFormat = "HH:mm";
-
-    //private String compareStringOne = "9:45";
-    //private String compareStringTwo = "1:45";
-
-    SimpleDateFormat inputParser = new SimpleDateFormat(inputFormat, Locale.US);
-
-    private void compareDates(){
-        Calendar now = Calendar.getInstance();
-
-        int hour = now.get(Calendar.HOUR);
-        int minute = now.get(Calendar.MINUTE);
-
-        Date date = parseDate(hour + ":" + minute);
-        Date dateCompareOne = parseDate(waktuMulai);
-        Date dateCompareTwo = parseDate(waktuSelesai);
-
-        if(dateCompareOne.before(date) && dateCompareTwo.after(date)) {
-            //want to do
-            Log.v("tes","masuk masuk masuk");
-        }
-    }
-
-    private Date parseDate(String date) {
-
-        try {
-            return inputParser.parse(date);
-        } catch (java.text.ParseException e) {
-            return new Date(0);
-        }
-    }
-}

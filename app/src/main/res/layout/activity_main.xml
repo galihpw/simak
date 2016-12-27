@@ -68,7 +68,7 @@
             android:textSize="14dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/textView3"
+            android:id="@+id/tvJmlhMhs"
             android:layout_marginBottom="10dp"
             android:layout_below="@+id/tvMatkul"
             android:layout_alignLeft="@+id/tvMatkul"

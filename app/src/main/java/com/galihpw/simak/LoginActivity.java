@@ -39,7 +39,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private static String url_login 	 = Config.URL + "login.php";
 
     //konstanta, supaya bisa membedakan antar message
-    public final static String EXTRA_MESSAGE = "com.galihpw.NIP";
+    public final static String LOGIN_MESSAGE = "com.galihpw.NIP";
+    public final static String LOGIN_MESSAGE1 = "com.galihpw.Status";
 
     //boolean variable to check user is logged in or not
     //initially it is false
@@ -74,7 +75,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         if(loggedIn){
             //We will start the Profile Activity
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            intent.putExtra(EXTRA_MESSAGE, nipp);
+            intent.putExtra(LOGIN_MESSAGE, nipp);
+            intent.putExtra(LOGIN_MESSAGE1, "1");
             startActivity(intent);
 
             finish();
@@ -110,7 +112,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                             //Starting profile activity
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                            intent.putExtra(EXTRA_MESSAGE, nip);
+                            intent.putExtra(LOGIN_MESSAGE, nip);
+                            intent.putExtra(LOGIN_MESSAGE1, "0");
                             startActivity(intent);
 
                             finish();
