@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <TextView
+        android:text="Judul Topik"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="40dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="40dp"
+        android:id="@+id/textView4" />
+
+    <EditText
+        android:layout_width="500dp"
+        android:layout_height="50dp"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:layout_below="@+id/textView4"
+        android:layout_alignLeft="@+id/textView4"
+        android:layout_alignStart="@+id/textView4"
+        android:layout_marginRight="40dp"
+        android:layout_marginEnd="40dp"
+        android:id="@+id/etJudul" />
+
+    <TextView
+        android:text="Deskripsi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/etJudul"
+        android:layout_alignLeft="@+id/etJudul"
+        android:layout_alignStart="@+id/etJudul"
+        android:layout_marginTop="10dp"
+        android:id="@+id/textView10" />
+
+    <EditText
+        android:layout_width="500dp"
+        android:layout_height="100dp"
+        android:inputType="textMultiLine"
+        android:ems="10"
+        android:layout_below="@+id/textView10"
+        android:layout_alignLeft="@+id/etJudul"
+        android:layout_alignStart="@+id/etJudul"
+        android:layout_marginRight="40dp"
+        android:layout_marginEnd="40dp"
+        android:id="@+id/etDesk" />
+
+    <Button
+        android:text="Batal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnbat"
+        android:layout_below="@+id/etDesk"
+        android:layout_toLeftOf="@+id/btnsim"
+        android:layout_toStartOf="@+id/btnsim" />
+
+    <Button
+        android:text="Simpan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnsim"
+        android:layout_below="@+id/etDesk"
+        android:layout_alignRight="@+id/etDesk"
+        android:layout_alignEnd="@+id/etDesk" />
+
+</RelativeLayout>

@@ -1,34 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context="com.galihpw.simak.ForumActivity">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
 
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-    </android.support.design.widget.AppBarLayout>
-
-    <include layout="@layout/content_forum" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+    <TextView
+        android:text="Hari, Tanggal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_input_add" />
+        android:layout_marginTop="18dp"
+        android:id="@+id/tvHariTglForum"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="19dp"
+        android:layout_marginEnd="19dp" />
 
-</android.support.design.widget.CoordinatorLayout>
+    <TextView
+        android:text="Matkul"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/tvHariTglForum"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="21dp"
+        android:layout_marginStart="21dp"
+        android:id="@+id/tvMatkulForum" />
+
+    <TextView
+        android:text="(KodeMatkul)"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvKodeMatkulForum"
+        android:layout_alignBaseline="@+id/tvMatkulForum"
+        android:layout_alignBottom="@+id/tvMatkulForum"
+        android:layout_toRightOf="@+id/tvMatkulForum"
+        android:layout_toEndOf="@+id/tvMatkulForum"
+        android:layout_marginLeft="11dp"
+        android:layout_marginStart="11dp" />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/tvMatkulForum"
+        android:layout_alignLeft="@+id/tvMatkulForum"
+        android:layout_alignStart="@+id/tvMatkulForum"
+        android:layout_marginTop="25dp"
+        android:layout_alignRight="@+id/tvHariTglForum"
+        android:layout_alignEnd="@+id/tvHariTglForum"
+        android:layout_marginBottom="25dp"
+        android:id="@+id/listviewForum" />
+</RelativeLayout>

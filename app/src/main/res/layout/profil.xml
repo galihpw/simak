@@ -23,7 +23,7 @@
         android:layout_marginTop="19dp"
         android:id="@+id/linearLayout7"
         android:layout_width="210dp"
-        android:layout_below="@+id/imageView5"
+        android:layout_below="@+id/fotofil"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true">
 
@@ -37,22 +37,14 @@
             <TextView
                 android:text="NIM"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/imageView5"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
                 android:id="@+id/textView9"
-                android:layout_width="82dp"
-                android:gravity="left|center" />
+                android:layout_width="82dp"/>
 
             <TextView
                 android:text=": nimDummy"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/textView10"
-                android:layout_alignLeft="@+id/nama"
-                android:layout_alignStart="@+id/nama"
-                android:id="@+id/nim"
-                android:layout_weight="1" />
+                android:id="@+id/nim" />
         </LinearLayout>
 
         <LinearLayout
@@ -193,13 +185,14 @@
         </LinearLayout>
     </LinearLayout>
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher"
-        android:id="@+id/imageView5"
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:layout_marginTop="5dp"
+        android:id="@+id/fotofil"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/default_profile"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="85dp"/>
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:text="Tambahkan Bintang!"

@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_rekap_absensi"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.galihpw.simak.RekapAbsensi">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/tabel_rekap">
+
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:layout_width="40dp"
+                        android:layout_height="match_parent"
+                        android:text="No"
+                        android:background="@drawable/cell_shape_header"
+                        android:gravity="center"
+                        android:fontFamily="casual"
+                        android:textStyle="normal|bold" />
+                    <TextView
+                        android:layout_width="250dp"
+                        android:layout_height="match_parent"
+                        android:text="Nama"
+                        android:background="@drawable/cell_shape_header"
+                        android:gravity="center"
+                        android:fontFamily="casual"
+                        android:textStyle="normal|bold" />
+
+                    <TableLayout
+                        android:layout_width="480dp"
+                        android:layout_height="wrap_content">
+
+                        <TableRow
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/cell_shape_header">
+
+                            <TextView
+                                android:text="Pertemuan"
+                                android:layout_span="16"
+                                android:layout_gravity="center_horizontal"
+                                android:fontFamily="casual"
+                                android:textStyle="normal|bold" />
+
+                        </TableRow>
+
+                        <TableRow
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/cell_shape_header">
+
+                            <TextView
+                                android:text="1"
+                                android:layout_width="30dp"
+                                android:layout_gravity="center_horizontal"/>
+                            <TextView
+                                android:text="2"
+                                android:layout_width="30dp"
+                                android:layout_gravity="center_horizontal"/>
+                            <TextView
+                                android:text="3"
+                                android:layout_width="30dp"
+                                android:layout_gravity="center_horizontal"/>
+                            <TextView
+                                android:text="4"
+                                android:layout_width="30dp"
+                                android:layout_gravity="center_horizontal"/>
+                            <TextView
+                                android:text="5"
+                                android:layout_width="30dp"
+                                android:layout_gravity="center_horizontal"/>
+                            <TextView
+                                android:text="6"
+                                android:layout_width="30dp"
+                                android:layout_gravity="center_horizontal"/>
+                            <TextView
+                                android:text="7"
+                                android:layout_width="30dp"
+                                android:layout_gravity="center_horizontal"/>
+                            <TextView
+                                android:text="8"
+                                android:layout_width="30dp"
+                                android:layout_gravity="center_horizontal"/>
+                            <TextView
+                                android:text="9"
+                                android:layout_width="30dp"
+                                android:layout_gravity="center_horizontal"/>
+                            <TextView
+                                android:text="10"
+                                android:layout_width="30dp"
+                                android:layout_gravity="center_horizontal"/>
+                            <TextView
+                                android:text="11"
+                                android:layout_width="30dp"
+                                android:layout_gravity="center_horizontal"/>
+                            <TextView
+                                android:text="12"
+                                android:layout_width="30dp"
+                                android:layout_gravity="center_horizontal"/>
+                            <TextView
+                                android:text="13"
+                                android:layout_width="30dp"
+                                android:layout_gravity="center_horizontal"/>
+                            <TextView
+                                android:text="14"
+                                android:layout_width="30dp"
+                                android:layout_gravity="center_horizontal"/>
+                            <TextView
+                                android:text="15"
+                                android:layout_width="30dp"
+                                android:layout_gravity="center_horizontal"/>
+                            <TextView
+                                android:text="16"
+                                android:layout_width="30dp"
+                                android:layout_gravity="center_horizontal"/>
+
+                        </TableRow>
+
+                    </TableLayout>
+
+                    <TextView
+                        android:layout_height="match_parent"
+                        android:text="Jumlah"
+                        android:background="@drawable/cell_shape_header"
+                        android:gravity="center"
+                        android:fontFamily="casual"
+                        android:layout_width="60dp"
+                        android:textStyle="normal|bold" />
+
+                </TableRow>
+
+            </TableLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <!--<TableLayout
+        android:id="@+id/table_judul"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true" >
+
+        <TableRow>
+            <TextView
+                android:id="@+id/no"
+                android:text="No"
+                android:padding="3dip"
+                android:layout_gravity="center_horizontal" />
+            <TextView
+                android:id="@+id/nama"
+                android:text="Nama"
+                android:layout_weight="1.5"
+                android:padding="3dip"
+                android:layout_gravity="center_horizontal" />
+            <TextView
+                android:id="@+id/pertemuan"
+                android:text="Pertemuan"
+                android:layout_span="16"
+                android:padding="3dip"
+                android:layout_gravity="center_horizontal" />
+        </TableRow>
+        <TableRow>
+            <TextView android:text=" "
+                android:padding="3dip" />
+            <TextView android:text="1"
+                android:padding="3dip" />
+            <TextView android:text="2"
+                android:padding="3dip" />
+            <TextView android:text="3"
+                android:padding="3dip" />
+            <TextView android:text="4"
+                android:padding="3dip" />
+            <TextView android:text="5"
+                android:padding="3dip" />
+            <TextView android:text="6"
+                android:padding="3dip" />
+            <TextView android:text="7"
+                android:padding="3dip" />
+            <TextView android:text="8"
+                android:padding="3dip" />
+            <TextView android:text="9"
+                android:padding="3dip" />
+            <TextView android:text="10"
+                android:padding="3dip" />
+            <TextView android:text="11"
+                android:padding="3dip" />
+            <TextView android:text="12"
+                android:padding="3dip" />
+            <TextView android:text="13"
+                android:padding="3dip" />
+            <TextView android:text="14"
+                android:padding="3dip" />
+            <TextView android:text="15"
+                android:padding="3dip" />
+            <TextView android:text="16"
+                android:padding="3dip" />
+        </TableRow>
+    </TableLayout>-->
+</RelativeLayout>

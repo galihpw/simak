@@ -53,15 +53,15 @@ public class TpkAdapter extends BaseAdapter {
         if (convertView == null)
             convertView = inflater.inflate(R.layout.listtopik, null);
 
-        TextView judul = (TextView) convertView.findViewById(R.id.judul);
-        TextView deskripsi = (TextView) convertView.findViewById(R.id.deskripsi);
-        TextView penanya = (TextView) convertView.findViewById(R.id.penanya);
+        //TextView judul = (TextView) convertView.findViewById(R.id.judul);
+        //TextView deskripsi = (TextView) convertView.findViewById(R.id.deskripsi);
+        //TextView penanya = (TextView) convertView.findViewById(R.id.penanya);
 
         Topik data = items.get(position);
 
-        judul.setText(data.getJudul());
+        /*judul.setText(data.getJudul());
         deskripsi.setText(data.getDeskripsi());
-        penanya.setText(data.getPenanya());
+        penanya.setText(data.getPenanya());*/
 
         return convertView;
     }

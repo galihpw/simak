@@ -1,10 +1,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
-    <item android:id="@+id/profile" android:title="Nama Dosen"
+    <item android:id="@+id/profile" android:title="@string/nama_dosen"
         android:orderInCategory="101" app:showAsAction="ifRoom" />
-    <item android:id="@+id/forum" android:title="Forum"
+    <item android:id="@+id/forum" android:title="@string/forum"
         android:orderInCategory="102" app:showAsAction="ifRoom" />
-    <item android:id="@+id/logout" android:title="Logout"
+    <item android:id="@+id/materi" android:title="@string/materi_kuliah"
         android:orderInCategory="103"/>
+    <item android:id="@+id/absensi" android:title="@string/rekap_absensi"
+        android:orderInCategory="104"/>
+    <item android:id="@+id/logout" android:title="@string/logout"
+        android:orderInCategory="105"/>
 </menu>

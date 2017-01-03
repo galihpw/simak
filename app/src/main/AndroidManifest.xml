@@ -40,12 +40,15 @@
         <activity
             android:name=".ForumActivity"
             android:label="@string/title_activity_forum"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" /><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
-     App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".IsiForum"
+            android:label="Isi Forum"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".RekapAbsensi"
+            android:label="Rekap Absensi"
+            android:screenOrientation="landscape"/>
     </application>
 
 </manifest>

@@ -4,12 +4,12 @@
     android:layout_height="wrap_content"
     android:id="@+id/bMhs">
 
-    <ImageView
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+    <de.hdodenhof.circleimageview.CircleImageView
         android:layout_marginTop="5dp"
         android:id="@+id/foto"
-        android:src="@drawable/upi"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/default_profile"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 

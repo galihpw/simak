@@ -1,145 +1,210 @@
 package com.galihpw.simak;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.galihpw.simak.adapter.TpkAdapter;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.galihpw.simak.config.Config;
 
-import org.w3c.dom.Text;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
-public class ForumActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener{
+public class ForumActivity extends AppCompatActivity{
 
-    ListView listTopik;
-    EditText judul, deskripsi;
-    TpkAdapter Adapter;
-    SwipeRefreshLayout swipe;
-    List<Topik> itemList = new ArrayList<Topik>();
-    Dialog dia;
-    public final static String EXTRA_MESSAGE = "com.galih.simak";
+    Calendar calendar;
+    TextView tvHariTglForum, vMatkulForum, vKodeMatkulForum, vDosenForum;
+    String dayName, sNim, sMatkulForum, sKodeMatkulForum, sDosenForum;
+    ProgressDialog loadingForum;
+
+    public final static String FORUM_MESSAGE1 = "com.galihpw.judulforum";
+    public final static String FORUM_MESSAGE2 = "com.galihpw.isiforum";
+
+    ListView listForum;
+    ArrayAdapter<String> adapter;
+    private ArrayList<String> items = new ArrayList<>();
+    private Topik[] mTopik;
+
+    private static String url_gTopik = Config.URL + "getTopik.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.forum);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
-        actionBar.setHomeButtonEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        if (actionBar != null) {
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
-        listTopik = (ListView) findViewById(R.id.lvTopik);
-        swipe   = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        listForum = (ListView) findViewById(R.id.listviewForum);
 
-        //set Adapter ke listview
-        Adapter = new TpkAdapter(ForumActivity.this, itemList);
-        listTopik.setAdapter(Adapter);
 
-        // menamilkan widget refresh
-        swipe.setOnRefreshListener(this);
+        Intent intent = getIntent();
+        sMatkulForum = intent.getStringExtra(MainActivity.MAIN_MESSAGE2);
+        sKodeMatkulForum = intent.getStringExtra(MainActivity.MAIN_MESSAGE3);
 
-        swipe.post(new Runnable() {
-                       @Override
-                       public void run() {
-                           swipe.setRefreshing(true);
-                           itemList.clear();
-                           Adapter.notifyDataSetChanged();
-                           //callVolley();
-                       }
-                   }
-        );
+        vMatkulForum = (TextView) findViewById(R.id.tvMatkulForum);
+        vKodeMatkulForum = (TextView) findViewById(R.id.tvKodeMatkulForum);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        tvHariTglForum = (TextView) findViewById(R.id.tvHariTglForum);
+        calendar = Calendar.getInstance();
+        SimpleDateFormat adf = new SimpleDateFormat("dd-MMM-yyyy", Locale.US);
+        String currentDate = adf.format(calendar.getTime());
+
+        SimpleDateFormat adf_ = new SimpleDateFormat("EEEE", Locale.US);
+        Date date = new Date();
+        dayName = adf_.format(date);
+        switch(dayName){
+            case "Monday":
+                dayName = "Senin";
+                break;
+            case "Tuesday":
+                dayName = "Selasa";
+                break;
+            case "Wednesday":
+                dayName = "Rabu";
+                break;
+            case "Thursday":
+                dayName = "Kamis";
+                break;
+            case "Friday":
+                dayName = "Jumat";
+                break;
+            case "Saturday":
+                dayName = "Sabtu";
+                break;
+            case "Sunday":
+                dayName = "Minggu";
+                break;
+        }
+        tvHariTglForum.setText("" + dayName + ", " + currentDate + "");
+        vMatkulForum.setText(sMatkulForum);
+        vKodeMatkulForum.setText("(" + sKodeMatkulForum + ")");
+
+        getDataForum();
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_forum,menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                //Write your logic here
+                this.finish();
+                return true;
+            case R.id.tambah_topik:
+                Toast.makeText(ForumActivity.this, "HAAAAAI", Toast.LENGTH_SHORT).show();
+                cobaCustomDialog();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void getDataForum(){
+        loadingForum = ProgressDialog.show(this, "Please wait...", "Fetching...", false, false);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_gTopik, new Response.Listener<String>() {
             @Override
-            public void onClick(View view) {
-                tambahTopik();
-                Toast.makeText(ForumActivity.this, "Tambah Topik", Toast.LENGTH_SHORT).show();
+            public void onResponse(String response) {
+                loadingForum.dismiss();
+                showJSONForum(response);
             }
-        });
-
-        listTopik.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        }, new Response.ErrorListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //Topik dataMhs = mTopik[position];
-                Intent intent = new Intent(ForumActivity.this, IsiTopik.class);
-                intent.putExtra(EXTRA_MESSAGE,position);
+            public void onErrorResponse(VolleyError error) {
+                loadingForum.dismiss();
+                Toast.makeText(ForumActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put(Config.KEY_KODE_MATKUL, sKodeMatkulForum);
+                return params;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+    }
+
+    private void showJSONForum(String response){
+        try{
+            //JSONObject jsonObject = new JSONObject(response);
+            JSONArray result = new JSONArray(response);
+            mTopik = new Topik[result.length()];
+            for(int i = 0;i < result.length();i++){
+                JSONObject Data = result.getJSONObject(i);
+                Topik data = new Topik("" + Data.getString(Config.KEY_JUDUL), "" + Data.getString(Config.KEY_ISITOPIK));
+                mTopik[i] = data;
+
+                items.add("Cek: " + mTopik[i].getJudulForum());
+            }
+
+
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
+
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, items);
+
+        listForum.setAdapter(adapter);
+        listForum.setClickable(true);
+        listForum.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Intent intent = new Intent(ForumActivity.this , IsiForum.class );
+                intent.putExtra(FORUM_MESSAGE1, "" + mTopik[position].getJudulForum());
+                intent.putExtra(FORUM_MESSAGE2, "" + mTopik[position].getIsiForum());
                 startActivity(intent);
             }
         });
     }
 
-    @Override
-    public void onRefresh() {
-        itemList.clear();
-        Adapter.notifyDataSetChanged();
-        //callVolley();
-    }
+    Dialog dia;
 
-    //Dialog untuk menambah Topik
-    public void tambahTopik(){
+    public void cobaCustomDialog() {
         dia = new Dialog(ForumActivity.this);
-        dia.setContentView(R.layout.tambah_topik);
+        dia.setContentView(R.layout.dialog_forum);
         dia.setTitle("Tambah Topik");
-        dia.setCancelable(false);
+        dia.setCancelable(true);
         dia.show();
-
-        judul = (EditText) dia.findViewById(R.id.jdlTopik);
-        deskripsi = (EditText) dia.findViewById(R.id.deskTopik);
-
-        //memanggil button Simpan yang ada pada dialog
-        Button buat = (Button) dia.findViewById(R.id.btnBuat);
-        buat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //itemList.clear();
-                Adapter.notifyDataSetChanged();
-                swipe.setRefreshing(true);
-
-                //String desk = deskTopik.getText().toString();
-                Toast.makeText(ForumActivity.this, judul.getText().toString(), Toast.LENGTH_SHORT).show();
-
-                Topik data = new Topik();
-
-                data.setJudul(judul.getText().toString());
-                data.setDeskripsi(deskripsi.getText().toString());
-                data.setPenanya("PENANYA");
-
-                //menambah data ke array
-                itemList.add(data);
-
-                // notifikasi adanya perubahan data pada adapter
-                Adapter.notifyDataSetChanged();
-
-                swipe.setRefreshing(false);
-
-                dia.dismiss();
-            }
-        });
-
-        //memanggil button Batal yang ada pada dialog
-        Button batal = (Button) dia.findViewById(R.id.btnBatal);
-        batal.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dia.dismiss(); //keluar dialog
-            }
-        });
     }
 
 }

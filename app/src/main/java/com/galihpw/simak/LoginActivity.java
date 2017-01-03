@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -32,6 +33,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     //Defining views
     private EditText editTextNip;
     private EditText editTextPassword;
+    private TextInputLayout inputLayoutNip, inputLayoutPassword;
     private Button buttonLogin;
     public ProgressDialog progressDialog;
     String nipp, nip;
@@ -54,6 +56,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         //Initializing views
         editTextNip = (EditText) findViewById(R.id.nip);
         editTextPassword = (EditText) findViewById(R.id.password);
+        inputLayoutNip = (TextInputLayout) findViewById(R.id.input_layout_nip);
+        inputLayoutPassword = (TextInputLayout) findViewById(R.id.input_layout_password);
 
         buttonLogin = (Button) findViewById(R.id.login_btn);
 

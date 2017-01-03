@@ -21,6 +21,10 @@ public class Config {
     public static final String KEY_WAKTU_SELESAI = "waktu_selesai";
     public static final String KEY_PERTEMUAN = "pertemuan";
 
+    //Keys for catch data in getTopik.php
+    public static final String KEY_JUDUL = "judul";
+    public static final String KEY_ISITOPIK = "isi_topik";
+
     //Keys for catch dosen data in dosen.php
     public static final String KEY_PHOTO = "photo";
     public static final String KEY_NAMA_DOSEN = "nama_dosen";

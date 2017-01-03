@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,6 +29,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.galihpw.simak.adapter.MhsAdapter;
@@ -42,6 +46,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class MainActivity extends AppCompatActivity {
 
     private Mhs[] mMhs;
@@ -54,6 +60,9 @@ public class MainActivity extends AppCompatActivity {
 
     //konstanta, supaya bisa membedakan antar message
     public final static String MAIN_MESSAGE = "com.galihpw.NIP";
+    public final static String MAIN_MESSAGE2 = "com.galihpw.Matkul";
+    public final static String MAIN_MESSAGE3 = "com.galihpw.KoMatkul";
+    public final static String MAIN_MESSAGE4 = "com.galihpw.dayName";
 
     private static String url_gDosen = Config.URL + "getDosen.php";
     private static String url_gAllMhs = Config.URL + "getAllMhs.php";
@@ -119,12 +128,33 @@ public class MainActivity extends AppCompatActivity {
         dia = new Dialog(MainActivity.this);
         dia.setContentView(R.layout.profil);
 
+        final CircleImageView foto = (CircleImageView) dia.findViewById(R.id.fotofil);
         TextView nama = (TextView) dia.findViewById(R.id.nama);
         TextView nim = (TextView) dia.findViewById(R.id.nim);
         TextView kelas = (TextView) dia.findViewById(R.id.kelas);
         TextView noKontak = (TextView) dia.findViewById(R.id.noKontak);
         TextView alamat = (TextView) dia.findViewById(R.id.alamat);
         TextView bintang = (TextView) dia.findViewById(R.id.jBintang);
+
+        //Get Photo Mahasiswa
+        String url = ""+ Config.URL+"photo/"+dataMhs.getNim()+".png";
+
+        // Retrieves an image specified by the URL, displays it in the UI.
+        ImageRequest request = new ImageRequest(url,
+                new Response.Listener<Bitmap>() {
+                    @Override
+                    public void onResponse(Bitmap bitmap) {
+                        foto.setImageBitmap(bitmap);
+                    }
+                }, 0, 0, null,
+                new Response.ErrorListener() {
+                    public void onErrorResponse(VolleyError error) {
+                        foto.setImageResource(R.drawable.default_profile);
+                    }
+                });
+        // Access the RequestQueue through your singleton class.
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(request);
 
         nama.setText(": " + dataMhs.getNama());
         nim.setText(": " + dataMhs.getNim());
@@ -221,17 +251,25 @@ public class MainActivity extends AppCompatActivity {
                 logout();
 
                 return true;
-            case R.id.forum:
-                Intent intent2 = new Intent(MainActivity.this, ForumActivity.class);
-                startActivity(intent2);
-
-                finish();
-                return true;
             case R.id.profile:
                 //Starting profile activity
                 Intent intent = new Intent(MainActivity.this, ProfileDosen.class);
                 intent.putExtra(MAIN_MESSAGE, nip);
                 startActivity(intent);
+
+                return true;
+            case R.id.forum:
+                Intent intent2 = new Intent(MainActivity.this, ForumActivity.class);
+                intent2.putExtra(MAIN_MESSAGE2, namaMatkul);
+                intent2.putExtra(MAIN_MESSAGE3, kodeMatkul);
+                startActivity(intent2);
+
+            return true;
+            case R.id.absensi:
+                Intent intent3 = new Intent(MainActivity.this, RekapAbsensi.class);
+                intent3.putExtra(MAIN_MESSAGE3, kodeMatkul);
+                intent3.putExtra(MAIN_MESSAGE4, dayName);
+                startActivity(intent3);
 
                 return true;
             default:
@@ -292,7 +330,7 @@ public class MainActivity extends AppCompatActivity {
         kodeMat.setText("Kode : " + kodeMatkul);
 
         compareDates();
-        Toast.makeText(this, "Masuk->" + waktuMulai + " | Keluar->" + waktuSelesai, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Masuk->" + waktuMulai + " | Keluar->" + waktuSelesai, Toast.LENGTH_SHORT).show();
     }
 
     private void getData() {
@@ -303,7 +341,11 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(String response) {
                 //loading.dismiss();
                 showJSON(response);
-                getDataMhs();
+                if(status == 0) {
+                    updatePertemuan();
+                }else{
+                    getDataMhs();
+                }
             }
         }, new Response.ErrorListener() {
             @Override
@@ -341,25 +383,70 @@ public class MainActivity extends AppCompatActivity {
         menuTitle.setTitle(sNama);
     }
 
-    private void getDataMhs() {
-        //loading = ProgressDialog.show(this,"Please wait...","Getting Data...",false,false);
+    private void updatePertemuan() {
+        //loading = ProgressDialog.show(this, "Please wait...", "Updating Data...", false, false);
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_gAllMhs, new Response.Listener<String>() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_uPertemuan, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                //oading.dismiss();
-                //Log.v("tes", response);
-                showJSONMhs(response);
-                if(status == 0) {
-                    updatePertemuan();
-                }else{
-                    loading.dismiss();
+                //If we are getting success from server
+                try {
+                    JSONObject jObj = new JSONObject(response);
+                    int success = jObj.getInt(Config.LOGIN_SUCCESS);
+
+                    if (success == 1) {
+                        //loading.dismiss();
+                        getDataMhs();
+                        //If the server response is success
+                        //Displaying an message on toast
+                        Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_LONG).show();
+                    } else {
+                        //loading.dismiss();
+                        //If the server response is not success
+                        //Displaying an error message on toast
+                        Toast.makeText(MainActivity.this, "Data not Updated", Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 //loading.dismiss();
+                Toast.makeText(MainActivity.this, "No Connection", Toast.LENGTH_LONG).show();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                //Adding parameters to request
+                params.put(Config.KEY_KODE_MATKUL, "" + kodeMatkul);
+
+                //returning parameter
+                return params;
+            }
+        };
+
+        //Adding the string request to the queue
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+    }
+
+    private void getDataMhs() {
+        //loading = ProgressDialog.show(this,"Please wait...","Getting Data...",false,false);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_gAllMhs, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                //Log.v("tes", response);
+                showJSONMhs(response);
+                //getDataMhs();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                loading.dismiss();
                 Toast.makeText(MainActivity.this, "No Connection", Toast.LENGTH_LONG).show();
             }
         }) {
@@ -409,6 +496,7 @@ public class MainActivity extends AppCompatActivity {
         }
         MhsAdapter adapter = new MhsAdapter(MainActivity.this, mMhs);
         gridview.setAdapter(adapter);
+        loading.dismiss();
     }
 
     private void updateBintang(final Mhs dataMhs) {
@@ -453,55 +541,6 @@ public class MainActivity extends AppCompatActivity {
                 //Adding parameters to request
                 params.put(Config.KEY_NIM, dataMhs.getNim());
                 params.put(Config.KEY_KODE_MATKUL, kodeMatkul);
-
-                //returning parameter
-                return params;
-            }
-        };
-
-        //Adding the string request to the queue
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(stringRequest);
-    }
-
-    private void updatePertemuan() {
-        //loading = ProgressDialog.show(this, "Please wait...", "Updating Data...", false, false);
-
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_uPertemuan, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                //If we are getting success from server
-                try {
-                    JSONObject jObj = new JSONObject(response);
-                    int success = jObj.getInt(Config.LOGIN_SUCCESS);
-
-                    if (success == 1) {
-                        loading.dismiss();
-                        //If the server response is success
-                        //Displaying an message on toast
-                        Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_LONG).show();
-                    } else {
-                       //loading.dismiss();
-                        //If the server response is not success
-                        //Displaying an error message on toast
-                        Toast.makeText(MainActivity.this, "Data not Updated", Toast.LENGTH_LONG).show();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                //loading.dismiss();
-                Toast.makeText(MainActivity.this, "No Connection", Toast.LENGTH_LONG).show();
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                //Adding parameters to request
-                params.put(Config.KEY_KODE_MATKUL, "" + kodeMatkul);
 
                 //returning parameter
                 return params;

@@ -1,7 +1,14 @@
 <resources>
     <string name="app_name">Simak</string>
     <string name="prof_dosen">Profile Dosen</string>
-    <string name="title_activity_forum">ForumActivity</string>
+    <string name="title_activity_forum">Forum</string>
+    <string name="nip">NIP</string>
+    <string name="password">Password</string>
+    <string name="nama_dosen">Nama Dosen</string>
+    <string name="forum">Forum</string>
+    <string name="materi_kuliah">Materi Kuliah</string>
+    <string name="rekap_absensi">Rekap Absensi</string>
+    <string name="logout">Logout</string>
 
 
 </resources>
