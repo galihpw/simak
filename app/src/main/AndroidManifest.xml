@@ -48,7 +48,11 @@
         <activity
             android:name=".RekapAbsensi"
             android:label="Rekap Absensi"
-            android:screenOrientation="landscape"/>
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".MateriActivity"
+            android:label="Materi"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

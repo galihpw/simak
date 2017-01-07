@@ -39,8 +39,8 @@ import java.util.Map;
 public class ForumActivity extends AppCompatActivity{
 
     Calendar calendar;
-    TextView tvHariTglForum, vMatkulForum, vKodeMatkulForum, vDosenForum;
-    String dayName, sNim, sMatkulForum, sKodeMatkulForum, sDosenForum;
+    TextView tvHariTglForum, vMatkulForum, vKodeMatkulForum;
+    String dayName, sMatkulForum, sKodeMatkulForum;
     ProgressDialog loadingForum;
 
     public final static String FORUM_MESSAGE1 = "com.galihpw.judulforum";
@@ -50,8 +50,6 @@ public class ForumActivity extends AppCompatActivity{
     ArrayAdapter<String> adapter;
     private ArrayList<String> items = new ArrayList<>();
     private Topik[] mTopik;
-
-    private static String url_gTopik = Config.URL + "getTopik.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,6 +137,8 @@ public class ForumActivity extends AppCompatActivity{
 
     private void getDataForum(){
         loadingForum = ProgressDialog.show(this, "Please wait...", "Fetching...", false, false);
+
+        String url_gTopik = Config.URL + "getTopik.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url_gTopik, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {

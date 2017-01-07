@@ -18,7 +18,7 @@ public class Mhs {
 
     }
 
-    public Mhs(String nama, String nim, String kelas, String noKontak, String alamat, String bintang){
+    Mhs(String nama, String nim, String kelas, String noKontak, String alamat, String bintang){
         this.nama = nama;
         this.nim = nim;
         this.kelas = kelas;
@@ -27,7 +27,7 @@ public class Mhs {
         this.bintang = bintang;
     }
 
-    public String getKelas() {
+    String getKelas() {
         return kelas;
     }
 
@@ -35,7 +35,7 @@ public class Mhs {
         this.kelas = kelas;
     }
 
-    public String getNoKontak() {
+    String getNoKontak() {
         return noKontak;
     }
 
@@ -43,7 +43,7 @@ public class Mhs {
         this.noKontak = noKontak;
     }
 
-    public String getAlamat() {
+    String getAlamat() {
         return alamat;
     }
 

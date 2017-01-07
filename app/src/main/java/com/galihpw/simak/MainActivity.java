@@ -265,6 +265,13 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent2);
 
             return true;
+            case R.id.materi:
+                Intent intent4 = new Intent(MainActivity.this, MateriActivity.class);
+                intent4.putExtra(MAIN_MESSAGE2, namaMatkul);
+                intent4.putExtra(MAIN_MESSAGE3, kodeMatkul);
+                startActivity(intent4);
+
+                return true;
             case R.id.absensi:
                 Intent intent3 = new Intent(MainActivity.this, RekapAbsensi.class);
                 intent3.putExtra(MAIN_MESSAGE3, kodeMatkul);

@@ -8,7 +8,12 @@ public class Topik {
     private String judulForum;
     private String isiForum;
 
-    public String getJudulForum() {
+    Topik(String judulForum, String isiForum){
+        this.judulForum = judulForum;
+        this.isiForum = isiForum;
+    }
+
+    String getJudulForum() {
         return judulForum;
     }
 
@@ -16,16 +21,11 @@ public class Topik {
         this.judulForum = judulForum;
     }
 
-    public String getIsiForum() {
+    String getIsiForum() {
         return isiForum;
     }
 
     public void setIsiForum(String isiForum) {
-        this.isiForum = isiForum;
-    }
-
-    public Topik(String judulForum, String isiForum){
-        this.judulForum = judulForum;
         this.isiForum = isiForum;
     }
 }

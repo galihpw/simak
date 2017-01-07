@@ -44,6 +44,11 @@ public class Config {
     public static final String KEY_FB_MHS = "facebook_mhs";
     public static final String KEY_TW_MHS = "twitter_mhs";
 
+    //Materi
+    public static final String KEY_ISI_MATERI = "isi_materi";
+    public static final String KEY_ISI_UPDATE_MATERI = "isi_update_materi";
+
+
     //Catch JSON result
     public static final String JSON_ARRAY = "result";
 
