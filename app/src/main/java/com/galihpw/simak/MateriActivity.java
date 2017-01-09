@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -42,7 +43,7 @@ public class MateriActivity extends AppCompatActivity {
     Calendar calendar;
     EditText etMateri, edtMateri;
     TextView tvHariTglMateri, vMatkulMateri, vKodeMatkulMateri;
-    String dayName, sMatkulMateri, sKodeMatkulMateri;
+    String dayName, sMatkulMateri, sKodeMatkulMateri, tampungMateri;
     ListView listMateri;
     ProgressDialog loading;
     Dialog dia;
@@ -175,7 +176,6 @@ public class MateriActivity extends AppCompatActivity {
                 listMateri.setOnItemClickListener(new AdapterView.OnItemClickListener(){
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                        Toast.makeText(MateriActivity.this, "tes - " + position, Toast.LENGTH_SHORT).show();
                         dialogMateri(pertemuan[position], isiMateri[position]);
                     }
                 });
@@ -243,7 +243,7 @@ public class MateriActivity extends AppCompatActivity {
                     params.put(Config.KEY_ISI_MATERI, "" + etMateri.getText().toString());
                     params.put(Config.KEY_KODE_MATKUL, "" + sKodeMatkulMateri);
                 }else if(status == 1){
-                    params.put(Config.KEY_ISI_MATERI, "" + etMateri.getText().toString());
+                    params.put(Config.KEY_ISI_MATERI, "" + tampungMateri);
                     params.put(Config.KEY_ISI_UPDATE_MATERI, "" + edtMateri.getText().toString());
                     params.put(Config.KEY_KODE_MATKUL, "" + sKodeMatkulMateri);
                 }
@@ -257,93 +257,25 @@ public class MateriActivity extends AppCompatActivity {
         requestQueue.add(stringRequest);
     }
 
-    private void deleteMateri(final String materi){
-        loading = ProgressDialog.show(this, "Please wait...", "Deleting...", false, false);
-
-        String url_gMateri = Config.URL + "deleteMateri.php";
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_gMateri, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                loading.dismiss();
-                showJSONForum(response);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                loading.dismiss();
-                Toast.makeText(MateriActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        }){
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put(Config.KEY_ISI_MATERI, materi);
-                return params;
-            }
-        };
-
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(stringRequest);
-    }
-
     public void dialogMateri(int i, final String materi) {
         dia = new Dialog(MateriActivity.this);
         dia.setContentView(R.layout.dialog_materi);
         dia.setTitle("Materi Pertemuan Ke-" + i);
         dia.setCancelable(true);
 
-        TextView tvMateri = (TextView) dia.findViewById(R.id.tvMateri);
         edtMateri = (EditText) dia.findViewById(R.id.edtMateri);
-        tvMateri.setText(materi);
         edtMateri.setText(materi);
+        tampungMateri = materi;
 
-        Button bhMateri = (Button) dia.findViewById(R.id.bhMateri);
-        bhMateri.setOnClickListener(new View.OnClickListener() {
+        Button beMateri = (Button) dia.findViewById(R.id.bhMateri);
+        beMateri.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                deleteMateri(materi);
-                dia.dismiss();
-            }
-        });
-
-        Button bsMateri = (Button) dia.findViewById(R.id.bsMateri);
-        bsMateri.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switcher();
                 insertupdateMateri(1);
                 dia.dismiss();
             }
         });
 
-        Button beMateri = (Button) dia.findViewById(R.id.beMateri);
-        beMateri.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switcher();
-                dia.dismiss();
-            }
-        });
-
         dia.show();
-    }
-
-    public void switcher(){
-        ViewSwitcher viewSwitcher0 =   (ViewSwitcher)findViewById(R.id.swMateri);
-        ViewSwitcher viewSwitcher1 =   (ViewSwitcher)findViewById(R.id.swEdit);
-
-        View myFirstView = findViewById(R.id.tvMateri);
-        View mySecondView = findViewById(R.id.edtMateri);
-
-        // TODO Auto-generated method stub
-        if (viewSwitcher0.getCurrentView() != myFirstView){
-
-            viewSwitcher0.showPrevious();
-            viewSwitcher1.showPrevious();
-        } else if (viewSwitcher0.getCurrentView() != mySecondView){
-
-            viewSwitcher0.showNext();
-            viewSwitcher1.showNext();
-        }
     }
 }

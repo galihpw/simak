@@ -10,74 +10,26 @@
     android:focusable="true"
     android:focusableInTouchMode="true">
 
-    <ViewSwitcher
-        android:id="@+id/swMateri"
+    <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:inAnimation="@android:anim/slide_in_left">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/tvMateri"
-            android:background="@drawable/border"
-            tools:text="isiMateri"
-            android:paddingTop="10dp"
-            android:paddingRight="10dp"
-            android:paddingLeft="10dp"
-            android:paddingBottom="10dp"
-            android:textSize="18sp" />
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/edtMateri"
-            android:background="@drawable/border"
-            android:paddingTop="10dp"
-            android:paddingRight="10dp"
-            android:paddingLeft="10dp"
-            android:paddingBottom="10dp"
-            android:textSize="18sp"/>
-
-    </ViewSwitcher>
-
-    <ViewSwitcher
-        android:id="@+id/swEdit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="42dp"
-        android:layout_marginStart="42dp"
-        android:inAnimation="@android:anim/slide_in_left"
-        android:layout_marginTop="17dp"
-        android:layout_below="@+id/swMateri"
-        android:layout_toRightOf="@+id/bhMateri"
-        android:layout_toEndOf="@+id/bhMateri">
-
-        <Button
-            android:text="Edit"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/beMateri" />
-
-        <Button
-            android:text="Simpan"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/bsMateri" />
-    </ViewSwitcher>
+        android:id="@+id/edtMateri"
+        android:background="@drawable/border"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp"
+        android:paddingBottom="10dp"
+        android:textSize="18sp"/>
 
     <Button
-        android:text="Hapus"
+        android:text="Perbaharui"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="167dp"
-        android:layout_marginStart="167dp"
         android:id="@+id/bhMateri"
-        android:layout_alignBaseline="@+id/swEdit"
-        android:layout_alignBottom="@+id/swEdit"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_below="@+id/edtMateri"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="23dp" />
 </RelativeLayout>
