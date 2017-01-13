@@ -45,6 +45,9 @@ public class ForumActivity extends AppCompatActivity{
 
     public final static String FORUM_MESSAGE1 = "com.galihpw.judulforum";
     public final static String FORUM_MESSAGE2 = "com.galihpw.isiforum";
+    public final static String FORUM_MESSAGE3 = "com.galihpw.nimforum";
+    public final static String FORUM_MESSAGE4 = "com.galihpw.idtopik";
+    public final static String FORUM_MESSAGE5 = "com.galihpw.nama";
 
     ListView listForum;
     ArrayAdapter<String> adapter;
@@ -112,23 +115,11 @@ public class ForumActivity extends AppCompatActivity{
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_forum,menu);
-
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 //Write your logic here
                 this.finish();
-                return true;
-            case R.id.tambah_topik:
-                Toast.makeText(ForumActivity.this, "HAAAAAI", Toast.LENGTH_SHORT).show();
-                cobaCustomDialog();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -195,16 +186,6 @@ public class ForumActivity extends AppCompatActivity{
                 startActivity(intent);
             }
         });
-    }
-
-    Dialog dia;
-
-    public void cobaCustomDialog() {
-        dia = new Dialog(ForumActivity.this);
-        dia.setContentView(R.layout.dialog_forum);
-        dia.setTitle("Tambah Topik");
-        dia.setCancelable(true);
-        dia.show();
     }
 
 }

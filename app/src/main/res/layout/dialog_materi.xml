@@ -25,7 +25,7 @@
         android:textSize="18sp"/>
 
     <Button
-        android:text="Perbaharui"
+        android:text="Tutup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/bhMateri"

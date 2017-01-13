@@ -23,5 +23,43 @@
         android:id="@+id/isiforum"
         android:layout_below="@+id/judulforum"
         android:layout_alignLeft="@+id/judulforum"
-        android:layout_alignStart="@+id/judulforum" />
+        android:layout_alignStart="@+id/judulforum"
+        android:layout_marginTop="5dp" />
+
+    <TextView
+        android:text="Komentar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView"
+        android:layout_below="@+id/isiforum"
+        android:layout_alignLeft="@+id/isiforum"
+        android:layout_alignStart="@+id/isiforum"
+        android:layout_marginTop="10dp"
+        android:textStyle="bold"/>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/listKomentar"
+        android:layout_below="@+id/textView"
+        android:layout_alignLeft="@+id/textView"
+        android:layout_alignStart="@+id/textView"
+        android:layout_marginRight="35dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="10dp"
+        android:divider="@color/colorAccent"
+        android:dividerHeight="1dp" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:id="@+id/namaforum"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_alignBaseline="@+id/judulforum"
+        android:layout_alignBottom="@+id/judulforum"
+        android:layout_alignRight="@+id/listKomentar"
+        android:layout_alignEnd="@+id/listKomentar" />
+
 </RelativeLayout>

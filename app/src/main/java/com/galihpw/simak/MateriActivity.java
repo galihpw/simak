@@ -271,7 +271,7 @@ public class MateriActivity extends AppCompatActivity {
         beMateri.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                insertupdateMateri(1);
+                //insertupdateMateri(1);
                 dia.dismiss();
             }
         });

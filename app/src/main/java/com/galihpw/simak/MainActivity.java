@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
+import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -56,20 +57,13 @@ public class MainActivity extends AppCompatActivity {
     ProgressDialog loading;
     Calendar calendar;
     TextView vHariTgl;
-    int n, status;
+    int n, status, count = 0;
 
     //konstanta, supaya bisa membedakan antar message
     public final static String MAIN_MESSAGE = "com.galihpw.NIP";
     public final static String MAIN_MESSAGE2 = "com.galihpw.Matkul";
     public final static String MAIN_MESSAGE3 = "com.galihpw.KoMatkul";
     public final static String MAIN_MESSAGE4 = "com.galihpw.dayName";
-
-    private static String url_gDosen = Config.URL + "getDosen.php";
-    private static String url_gAllMhs = Config.URL + "getAllMhs.php";
-    private static String url_gJadwal = Config.URL + "getJadwal.php";
-    private static String url_uBintang = Config.URL + "updateBintang.php";
-    private static String url_uPertemuan = Config.URL + "updateMatkul.php";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -200,6 +194,8 @@ public class MainActivity extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface arg0, int arg1) {
+                        //change status dosen
+                        updateLogout();
 
                         //Getting out sharedpreferences
                         SharedPreferences preferences = getSharedPreferences(Config.SHARED_PREF_NAME, Context.MODE_PRIVATE);
@@ -235,6 +231,58 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
 
+    }
+
+    private void updateLogout() {
+        //loading = ProgressDialog.show(this, "Please wait...", "Updating Data...", false, false);
+
+        String url_uLogout = Config.URL + "logout.php";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_uLogout, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                //If we are getting success from server
+                try {
+                    JSONObject jObj = new JSONObject(response);
+                    int success = jObj.getInt(Config.LOGIN_SUCCESS);
+
+                    if (success == 1) {
+                        //loading.dismiss();
+                        getDataMhs();
+                        doTheAutoRefresh();
+                        //If the server response is success
+                        //Displaying an message on toast
+                        Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_LONG).show();
+                    } else {
+                        //loading.dismiss();
+                        //If the server response is not success
+                        //Displaying an error message on toast
+                        Toast.makeText(MainActivity.this, "Data not Updated", Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //loading.dismiss();
+                Toast.makeText(MainActivity.this, "No Connection", Toast.LENGTH_LONG).show();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                //Adding parameters to request
+                params.put(Config.KEY_NIP, "" + nip);
+
+                //returning parameter
+                return params;
+            }
+        };
+
+        //Adding the string request to the queue
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
     }
 
     @Override
@@ -287,6 +335,7 @@ public class MainActivity extends AppCompatActivity {
     private void getJadwal() {
         //loading = ProgressDialog.show(this, "Please wait...", "Getting Data1...", false, false);
 
+        String url_gJadwal = Config.URL + "getJadwal.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url_gJadwal, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -343,6 +392,7 @@ public class MainActivity extends AppCompatActivity {
     private void getData() {
         //loading = ProgressDialog.show(this,"Please wait...","Getting Data...",false,false);
 
+        String url_gDosen = Config.URL + "getDosen.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url_gDosen, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -352,6 +402,7 @@ public class MainActivity extends AppCompatActivity {
                     updatePertemuan();
                 }else{
                     getDataMhs();
+                    doTheAutoRefresh();
                 }
             }
         }, new Response.ErrorListener() {
@@ -393,6 +444,7 @@ public class MainActivity extends AppCompatActivity {
     private void updatePertemuan() {
         //loading = ProgressDialog.show(this, "Please wait...", "Updating Data...", false, false);
 
+        String url_uPertemuan = Config.URL + "updateMatkul.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url_uPertemuan, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -404,6 +456,7 @@ public class MainActivity extends AppCompatActivity {
                     if (success == 1) {
                         //loading.dismiss();
                         getDataMhs();
+                        doTheAutoRefresh();
                         //If the server response is success
                         //Displaying an message on toast
                         Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_LONG).show();
@@ -443,6 +496,7 @@ public class MainActivity extends AppCompatActivity {
     private void getDataMhs() {
         //loading = ProgressDialog.show(this,"Please wait...","Getting Data...",false,false);
 
+        String url_gAllMhs = Config.URL + "getAllMhs.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url_gAllMhs, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -509,6 +563,7 @@ public class MainActivity extends AppCompatActivity {
     private void updateBintang(final Mhs dataMhs) {
         loading = ProgressDialog.show(this, "Please wait...", "Updating Data...", false, false);
 
+        String url_uBintang = Config.URL + "updateBintang.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url_uBintang, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -557,6 +612,25 @@ public class MainActivity extends AppCompatActivity {
         //Adding the string request to the queue
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(stringRequest);
+    }
+
+    //Auto Refresh
+    private final Handler handler = new Handler();
+
+    private void doTheAutoRefresh() {
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // Write code for your refresh logic
+                //Toast.makeText(MainActivity.this, "Refresh", Toast.LENGTH_SHORT).show();
+                getDataMhs();
+                loading.dismiss();
+                count++;
+                if(count < 6) {
+                    doTheAutoRefresh();
+                }
+            }
+        }, 60000);
     }
 
     // Compare Time

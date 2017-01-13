@@ -48,6 +48,12 @@ public class Config {
     public static final String KEY_ISI_MATERI = "isi_materi";
     public static final String KEY_ISI_UPDATE_MATERI = "isi_update_materi";
 
+    //Forum
+    public static final String KEY_ID_TOPIK = "id_topik";
+
+    //Komentar
+    public static final String KEY_ISI_KOMENTAR = "isi_komentar";
+
 
     //Catch JSON result
     public static final String JSON_ARRAY = "result";
