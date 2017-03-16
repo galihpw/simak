@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -22,6 +23,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.galihpw.simak.config.Config;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,19 +39,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText editTextNip;
     private EditText editTextPassword;
     private TextInputLayout inputLayoutNip, inputLayoutPassword;
-    private Button buttonLogin;
     public ProgressDialog progressDialog;
-    String nipp, nip;
-
-    private static String url_login 	 = Config.URL + "login.php";
+    String nipp, nip, kodeMatkul, namaMatkul, waktuMulai, waktuSelesai;
 
     //konstanta, supaya bisa membedakan antar message
     public final static String LOGIN_MESSAGE = "com.galihpw.NIP";
     public final static String LOGIN_MESSAGE1 = "com.galihpw.Status";
-
-    //boolean variable to check user is logged in or not
-    //initially it is false
-    private boolean loggedIn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +57,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         inputLayoutNip = (TextInputLayout) findViewById(R.id.input_layout_nip);
         inputLayoutPassword = (TextInputLayout) findViewById(R.id.input_layout_password);
 
-        buttonLogin = (Button) findViewById(R.id.login_btn);
+        Button buttonLogin = (Button) findViewById(R.id.login_btn);
 
         //Adding click listener
         buttonLogin.setOnClickListener(this);
@@ -72,7 +70,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         SharedPreferences sharedPreferences = getSharedPreferences(Config.SHARED_PREF_NAME,Context.MODE_PRIVATE);
 
         //Fetching the boolean value form sharedpreferences
-        loggedIn = sharedPreferences.getBoolean(Config.LOGGEDIN_SHARED_PREF, false);
+        boolean loggedIn = sharedPreferences.getBoolean(Config.LOGGEDIN_SHARED_PREF, false);
         nipp = sharedPreferences.getString(Config.NIP_SHARED_PREF, nip);
 
         //If we will get true
@@ -93,6 +91,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         final String password = editTextPassword.getText().toString().trim();
 
         //Creating a string request
+        String url_login = Config.URL + "login.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url_login,
                 new Response.Listener<String>() {
                     @Override
@@ -110,7 +109,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             editor.putString(Config.NIP_SHARED_PREF, nip);
 
                             //Saving values to editor
-                            editor.commit();
+                            editor.apply();
 
                             progressDialog.dismiss();
 
@@ -204,5 +203,61 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
 
         return valid;
+    }
+
+    private void getJadwal() {
+        //loading = ProgressDialog.show(this, "Please wait...", "Getting Data1...", false, false);
+
+        String url_gJadwal = Config.URL + "getJadwal.php";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_gJadwal, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                //loading.dismiss();
+                showJSONJadwal(response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //loading.dismiss();
+                Toast.makeText(LoginActivity.this, "No Connection", Toast.LENGTH_LONG).show();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                //Adding parameters to request
+                params.put(Config.KEY_NIP, nip);
+                //params.put(Config.KEY_HARI, dayName);
+
+                //returning parameter
+                return params;
+            }
+        };
+
+        //Adding the string request to the queue
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+    }
+
+    private void showJSONJadwal(String response) {
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            JSONArray result = jsonObject.getJSONArray(Config.JSON_ARRAY);
+            JSONObject Data = result.getJSONObject(0);
+            kodeMatkul = Data.getString(Config.KEY_KODE_MATKUL);
+            namaMatkul = Data.getString(Config.KEY_NAMA_MATKUL);
+            waktuMulai = Data.getString(Config.KEY_WAKTU_MULAI);
+            waktuSelesai = Data.getString(Config.KEY_WAKTU_SELESAI);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        TextView namaMat = (TextView) findViewById(R.id.tvMatkul);
+        namaMat.setText("Mata Kuliah : " + namaMatkul);
+
+        TextView kodeMat = (TextView) findViewById(R.id.tvKode);
+        kodeMat.setText("Kode : " + kodeMatkul);
+
+        //compareDates();
+        //Toast.makeText(this, "Masuk->" + waktuMulai + " | Keluar->" + waktuSelesai, Toast.LENGTH_SHORT).show();
     }
 }

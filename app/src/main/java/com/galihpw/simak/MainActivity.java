@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Mhs[] mMhs;
     Dialog dia;
-    String nip, sNama, dayName, kodeMatkul, namaMatkul, waktuMulai, waktuSelesai;
+    String nip, sNama, dayName, kodeMatkul, namaMatkul;
     ProgressDialog loading;
     Calendar calendar;
     TextView vHariTgl;
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
         //get data
         loading = ProgressDialog.show(this, "Please wait...", "Getting Data1...", false, false);
-        getJadwal();
+        getData();
     }
 
     //method untuk membuat halaman menjadi dialog
@@ -330,63 +330,6 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    private void getJadwal() {
-        //loading = ProgressDialog.show(this, "Please wait...", "Getting Data1...", false, false);
-
-        String url_gJadwal = Config.URL + "getJadwal.php";
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_gJadwal, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                //loading.dismiss();
-                showJSONJadwal(response);
-                getData();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                //loading.dismiss();
-                Toast.makeText(MainActivity.this, "No Connection", Toast.LENGTH_LONG).show();
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                //Adding parameters to request
-                params.put(Config.KEY_NIP, nip);
-                params.put(Config.KEY_HARI, dayName);
-
-                //returning parameter
-                return params;
-            }
-        };
-
-        //Adding the string request to the queue
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(stringRequest);
-    }
-
-    private void showJSONJadwal(String response) {
-        try {
-            JSONObject jsonObject = new JSONObject(response);
-            JSONArray result = jsonObject.getJSONArray(Config.JSON_ARRAY);
-            JSONObject Data = result.getJSONObject(0);
-            kodeMatkul = Data.getString(Config.KEY_KODE_MATKUL);
-            namaMatkul = Data.getString(Config.KEY_NAMA_MATKUL);
-            waktuMulai = Data.getString(Config.KEY_WAKTU_MULAI);
-            waktuSelesai = Data.getString(Config.KEY_WAKTU_SELESAI);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        TextView namaMat = (TextView) findViewById(R.id.tvMatkul);
-        namaMat.setText("Mata Kuliah : " + namaMatkul);
-
-        TextView kodeMat = (TextView) findViewById(R.id.tvKode);
-        kodeMat.setText("Kode : " + kodeMatkul);
-
-        compareDates();
-        //Toast.makeText(this, "Masuk->" + waktuMulai + " | Keluar->" + waktuSelesai, Toast.LENGTH_SHORT).show();
     }
 
     private void getData() {
@@ -638,7 +581,7 @@ public class MainActivity extends AppCompatActivity {
 
     SimpleDateFormat inputParser = new SimpleDateFormat(inputFormat, Locale.US);
 
-    private void compareDates(){
+    /*private void compareDates(){
         Calendar now = Calendar.getInstance();
 
         int hour = now.get(Calendar.HOUR);
@@ -652,7 +595,7 @@ public class MainActivity extends AppCompatActivity {
             //want to do
             Log.v("tes","masuk masuk masuk");
         }
-    }
+    }*/
 
     private Date parseDate(String date) {
 
